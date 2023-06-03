@@ -1,3 +1,7 @@
+let faggot: str = "hi faggotsss"
 let furry: int = 5
 let mommy: int = 9
-let faggot: str = "hi faggotsss"
+let taylorName: str = "Taylor Whitewood"
+
+print "i love $[taylorName]"
+print "other values: $[faggot], $[furry], $[mommy]"

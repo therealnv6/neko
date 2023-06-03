@@ -11,14 +11,4 @@ int main()
 
 	interpreter interpreter { program };
 	interpreter.run();
-
-	for (const auto &entry : interpreter.get_values())
-	{
-		const auto &key = entry.first;
-		const auto &[type, value] = entry.second;
-
-		std::cout << key << ": (" << type << ") " << value << std::endl;
-	}
-
-	return 0;
 }
