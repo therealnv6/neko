@@ -4,15 +4,18 @@
 int main()
 {
 	std::string program = R"(
-      let x: int = 5
-      let y: int = 93193921
-      let z: int = 7
+      let mommy: int = 9
+      let faggot: str = "hi faggotsss"
     )";
 
 	interpreter interpreter { program };
 	interpreter.run();
 
-	std::cout << "x: " << interpreter.get_value_at("x").second << std::endl;
-	std::cout << "y: " << interpreter.get_value_at("y").second << std::endl;
-	std::cout << "z: " << interpreter.get_value_at("z").second << std::endl;
+	for (auto entry : interpreter.get_values())
+	{
+		auto key = entry.first;
+		auto [type, value] = entry.second;
+
+		std::cout << key << ": (" << type << ") " << value << std::endl;
+	}
 }

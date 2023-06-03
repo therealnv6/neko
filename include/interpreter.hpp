@@ -61,6 +61,11 @@ public:
 		return variables[key];
 	}
 
+	std::map<std::string, std::pair<std::string, std::string>> get_values()
+	{
+		return variables;
+	}
+
 private:
 	token get_next_token()
 	{
@@ -151,6 +156,20 @@ private:
 		}
 	}
 
+	token_type get_token_from_type(std::string type)
+	{
+		if (type == "int")
+		{
+			return token_type::integer;
+		}
+		else if (type == "str")
+		{
+			return token_type::str;
+		}
+
+		return token_type::eof;
+	}
+
 	void handle_let_statement()
 	{
 		token identifier_token = get_next_token(); // Expecting an identifier
@@ -162,7 +181,7 @@ private:
 		expect_token(token_type::eq, get_next_token());
 
 		token value_token = get_next_token(); // Expecting a value
-		expect_token(token_type::integer, value_token);
+		expect_token(get_token_from_type(type_token.value), value_token);
 
 		variables[identifier_token.value] = std::make_pair(type_token.value, value_token.value);
 	}
