@@ -4,10 +4,10 @@
 int main()
 {
 	std::string program = R"(
-    let x: int = 5
-    let y: int = 93193921
-    let z: int = 7
-  )";
+      let x: int = 5
+      let y: int = 93193921
+      let z: int = 7
+    )";
 
 	interpreter interpreter { program };
 	interpreter.run();
