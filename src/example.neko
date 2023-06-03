@@ -8,4 +8,5 @@ print "other values: $[faggot], $[furry], $[mommy]"
 
 fn test(name: str, age: int)
 {
+  print "hi"
 }
