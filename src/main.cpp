@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::ifstream inputFile("./src/example.fast");
+	std::ifstream inputFile("./src/example.neko");
 	std::string program((std::istreambuf_iterator<char>(inputFile)),
 		std::istreambuf_iterator<char>());
 
