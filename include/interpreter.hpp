@@ -204,7 +204,10 @@ private:
 
 		if (token.type != expected_type)
 		{
-			throw std::runtime_error("Syntax error: Unexpected token: " + token.value + ". Expected token type: " + std::to_string(static_cast<int>(expected_type)));
+			throw std::runtime_error(
+				"Syntax error: Unexpected token: " + token.value
+				+ ". Expected token type: "
+				+ std::to_string(static_cast<int>(expected_type)));
 		}
 	}
 };
