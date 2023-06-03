@@ -1,21 +1,24 @@
+#include <fstream>
 #include <interpreter.hpp>
+#include <iostream>
 #include <token.hpp>
 
 int main()
 {
-	std::string program = R"(
-      let mommy: int = 9
-      let faggot: str = "hi faggotsss"
-    )";
+	std::ifstream inputFile("./src/example.fast");
+	std::string program((std::istreambuf_iterator<char>(inputFile)),
+		std::istreambuf_iterator<char>());
 
 	interpreter interpreter { program };
 	interpreter.run();
 
-	for (auto entry : interpreter.get_values())
+	for (const auto &entry : interpreter.get_values())
 	{
-		auto key = entry.first;
-		auto [type, value] = entry.second;
+		const auto &key = entry.first;
+		const auto &[type, value] = entry.second;
 
 		std::cout << key << ": (" << type << ") " << value << std::endl;
 	}
+
+	return 0;
 }
