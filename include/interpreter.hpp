@@ -20,6 +20,13 @@ private:
 
 	std::map<std::string, std::pair<std::string, std::string>> variables;
 	std::map<token_type, function> func_map;
+
+	std::unordered_map<std::string, token_type> type_tokens = {
+		{	  "str",	 token_type::str},
+		{	  "int", token_type::integer},
+		{"integer", token_type::integer},
+	};
+
 	std::unordered_map<std::string, token_type> char_tokens = {
 		{":",	   token_type::colon},
 		{"=",	   token_type::eq},
@@ -156,20 +163,6 @@ private:
 		}
 	}
 
-	token_type get_token_from_type(std::string type)
-	{
-		if (type == "int")
-		{
-			return token_type::integer;
-		}
-		else if (type == "str")
-		{
-			return token_type::str;
-		}
-
-		return token_type::eof;
-	}
-
 	void handle_let_statement()
 	{
 		token identifier_token = get_next_token(); // Expecting an identifier
@@ -181,7 +174,14 @@ private:
 		expect_token(token_type::eq, get_next_token());
 
 		token value_token = get_next_token(); // Expecting a value
-		expect_token(get_token_from_type(type_token.value), value_token);
+		auto type = type_tokens.find(type_token.value);
+
+		if (type == type_tokens.end())
+		{
+			throw std::runtime_error("provided unknown type: " + type_token.value);
+		}
+
+		expect_token(type->second, value_token);
 
 		variables[identifier_token.value] = std::make_pair(type_token.value, value_token.value);
 	}
