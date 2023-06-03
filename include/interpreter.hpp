@@ -85,9 +85,9 @@ private:
 		std::string output = value_token.value;
 		std::size_t pos = 0;
 
-		while ((pos = output.find("$[", pos)) != std::string::npos)
+		while ((pos = output.find("${", pos)) != std::string::npos)
 		{
-			std::size_t end_pos = output.find("]", pos + 2);
+			std::size_t end_pos = output.find("}", pos + 2);
 			std::string variable_name = output.substr(pos + 2, end_pos - pos - 2);
 
 			if (variables.count(variable_name) > 0)

@@ -3,8 +3,8 @@ let furry: int = 5
 let mommy: int = 9
 let taylorName: str = "Taylor Whitewood"
 
-print "i love $[taylorName]"
-print "other values: $[faggot], $[furry], $[mommy]"
+print "i love ${taylorName}"
+print "other values: ${faggot}, ${furry}, ${mommy}"
 
 fn test(name: str, age: int)
 {
