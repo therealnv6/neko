@@ -36,6 +36,11 @@ static const std::unordered_map<std::string, token_type> keywords = {
 	{"print", token_type::print}
 };
 
+const std::unordered_map<std::string, token_type> type_tokens = {
+	{"int", token_type::integer},
+	{"str",	 token_type::string}
+};
+
 struct token {
 	token_type type;
 	std::string value;

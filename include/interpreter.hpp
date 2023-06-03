@@ -117,10 +117,4 @@ private:
 				+ std::to_string(static_cast<int>(expected_type)));
 		}
 	}
-
-private:
-	const std::unordered_map<std::string, token_type> type_tokens = {
-		{"int", token_type::integer},
-		{"str",	 token_type::string}
-	};
 };
