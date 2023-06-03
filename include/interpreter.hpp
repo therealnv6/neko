@@ -1,5 +1,7 @@
 #pragma once
+#include "token.hpp"
 #include <lexer.hpp>
+#include <stdexcept>
 
 class interpreter
 {
@@ -8,9 +10,14 @@ class interpreter
 private:
 	std::string program;
 	lex::lexer lexer;
+
 	token current_token = {};
 
 	std::map<std::string, std::pair<std::string, std::string>> variables;
+
+	std::map<std::string, std::pair<int, int>> function_addresses;
+	std::map<std::string, std::map<std::string, token_type>> function_token_map;
+
 	std::map<token_type, callback> func_map;
 
 public:
@@ -20,6 +27,7 @@ public:
 	{
 		func_map.emplace(token_type::let, &interpreter::handle_let);
 		func_map.emplace(token_type::print, &interpreter::handle_print);
+		func_map.emplace(token_type::function, &interpreter::handle_function);
 	}
 
 	void run()
@@ -53,25 +61,20 @@ public:
 private:
 	void handle_let()
 	{
-		token identifier_token = lexer.get_next_token();
-		expect_token(token_type::identifier, identifier_token);
-		expect_token(token_type::colon, lexer.get_next_token());
+		lex::let_data data = lexer.lex_let();
 
-		token type_token = lexer.get_next_token();
-		expect_token(token_type::identifier, type_token);
-		expect_token(token_type::equals, lexer.get_next_token());
+		variables[data.var.name] = std::make_pair(data.var.type_container.type_name, data.value->data());
+	}
 
-		token value_token = lexer.get_next_token();
-		auto type = type_tokens.find(type_token.value);
+	void handle_function()
+	{
+		lex::function_data data = lexer.lex_function();
 
-		if (type == type_tokens.end())
-		{
-			throw std::runtime_error("Provided unknown type: " + type_token.value);
-		}
-
-		expect_token(type->second, value_token);
-
-		variables[identifier_token.value] = std::make_pair(type_token.value, value_token.value);
+		std::cout << "function address for "
+				  << data.function_name
+				  << ": "
+				  << data.address.first
+				  << std::endl;
 	}
 
 	void handle_print()
@@ -104,11 +107,6 @@ private:
 
 	void expect_token(token_type expected_type, const token &token)
 	{
-		if (token.type == token_type::eof)
-		{
-			return;
-		}
-
 		if (token.type != expected_type)
 		{
 			throw std::runtime_error(

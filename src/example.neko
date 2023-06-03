@@ -5,3 +5,7 @@ let taylorName: str = "Taylor Whitewood"
 
 print "i love $[taylorName]"
 print "other values: $[faggot], $[furry], $[mommy]"
+
+fn test(name: str, age: int)
+{
+}

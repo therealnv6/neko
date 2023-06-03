@@ -19,21 +19,36 @@ enum class token_type
 	equals,
 	plus,
 	minus,
+	comma,
+
+	// Functions
+	function,
+	parameter,
+	left_parenthesis,
+	right_parenthesis,
+	left_brace,
+	right_brace,
 
 	// End of file
 	eof
 };
 
 static const std::unordered_map<std::string, token_type> char_tokens = {
-	{":",  token_type::colon},
-	{"=", token_type::equals},
-	{"+",   token_type::plus},
-	{"-",  token_type::minus}
+	{":",			 token_type::colon},
+	{"=",			token_type::equals},
+	{"+",			  token_type::plus},
+	{"-",			 token_type::minus},
+	{"(",  token_type::left_parenthesis},
+	{")", token_type::right_parenthesis},
+	{"{",		   token_type::left_brace},
+	{"}",	   token_type::right_brace},
+	{",",			 token_type::comma},
 };
 
 static const std::unordered_map<std::string, token_type> keywords = {
-	{  "let",	 token_type::let},
-	{"print", token_type::print}
+	{  "let",		 token_type::let},
+	{"print",	   token_type::print},
+	{	  "fn", token_type::function}
 };
 
 const std::unordered_map<std::string, token_type> type_tokens = {
