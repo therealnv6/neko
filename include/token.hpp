@@ -29,21 +29,25 @@ enum class token_type
 	right_parenthesis,
 	left_brace,
 	right_brace,
+	left_square_bracket,
+	right_square_bracket,
 
 	// End of file
 	eof
 };
 
 static const std::unordered_map<std::string, token_type> char_tokens = {
-	{":",			 token_type::colon},
-	{"=",			token_type::equals},
-	{"+",			  token_type::plus},
-	{"-",			 token_type::minus},
-	{"(",  token_type::left_parenthesis},
-	{")", token_type::right_parenthesis},
+	{":",				token_type::colon},
+	{"=",			   token_type::equals},
+	{"+",				 token_type::plus},
+	{"-",				token_type::minus},
+	{"(",	   token_type::left_parenthesis},
+	{")",	   token_type::right_parenthesis},
 	{"{",		   token_type::left_brace},
-	{"}",	   token_type::right_brace},
-	{",",			 token_type::comma},
+	{"}",		   token_type::right_brace},
+	{"[",  token_type::left_square_bracket},
+	{"]", token_type::right_square_bracket},
+	{",",				token_type::comma},
 };
 
 static const std::unordered_map<std::string, token_type> keywords = {

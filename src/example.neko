@@ -1,10 +1,7 @@
-let globalVariable: str = "hey"
-
-fn test(age: int)
+fn test(age: int, name: str)
 {
-  print "called function test() with value ${age}"
-  print "globalVariable = ${globalVariable}"
+  print "called function test() with value ${age} and ${name}"
 }
 
-test[]
-test[]
+test[5, "taylor"]
+test[7, "riven"]

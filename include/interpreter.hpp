@@ -87,17 +87,26 @@ private:
 		lex::function_data data = lexer.lex_function();
 
 		function_addresses.emplace(data.function_name, data.address);
-		std::cout << "function address for "
-				  << data.function_name
-				  << ": "
-				  << data.address.first
-				  << std::endl;
+
+		std::map<std::string, token_type> tokens;
+
+		for (auto token : data.token_data)
+		{
+			auto token_type = token.type_container.type;
+			auto variable_name = token.name;
+
+			tokens.emplace(variable_name, token_type);
+		}
+
+		function_token_map.emplace(data.function_name, tokens);
 	}
 
 	void handle_function_call(token &current)
 	{
 		previous_stack = lexer.get_token_pos();
+
 		auto call_site = function_addresses.find(current.value);
+		auto tokens = function_token_map.find(current.value);
 
 		if (call_site == function_addresses.end())
 		{
@@ -106,7 +115,26 @@ private:
 
 		auto [begin, end] = call_site->second;
 
+		lexer.expect_token(token_type::left_square_bracket, lexer.get_next_token());
+
+		if (tokens != function_token_map.end())
+		{
+			for (auto entry : tokens->second)
+			{
+				if (lexer.get_at() == ',')
+				{
+					lexer.consume();
+				}
+
+				// we may want to write this data to a different register than variables,
+				// we'll see in the future.
+				variables[entry.first] = std::make_pair("" /*todo: fill this*/, lexer.get_next_token().value);
+			}
+		}
+
+		lexer.expect_token(token_type::right_square_bracket, lexer.get_next_token());
 		lexer.set_token_pos(begin);
+
 		stack_limit_switch = end;
 	}
 

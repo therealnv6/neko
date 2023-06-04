@@ -47,6 +47,11 @@ namespace lex
 		{
 		}
 
+		void consume()
+		{
+			pos++;
+			current_char = (pos < program.length()) ? program[pos] : '\0';
+		}
 		token get_next_token()
 		{
 			while (current_char != '\0')
@@ -80,7 +85,7 @@ namespace lex
 					result.type = token->second;
 					result.value = token->first;
 
-					consume_char();
+					consume();
 					return result;
 				}
 
@@ -198,6 +203,11 @@ namespace lex
 			return std::make_pair(identifier_token, type_token);
 		}
 
+		char get_at(int index = -1)
+		{
+			return index == -1 ? current_char : program[index];
+		}
+
 		int get_token_pos()
 		{
 			return pos;
@@ -208,7 +218,6 @@ namespace lex
 			this->pos = pos;
 		}
 
-	private:
 		void expect_token(token_type expected_type, const token &token)
 		{
 			if (token.type != expected_type)
@@ -219,17 +228,13 @@ namespace lex
 					+ std::to_string(static_cast<int>(expected_type)));
 			}
 		}
-		void consume_char()
-		{
-			pos++;
-			current_char = (pos < program.length()) ? program[pos] : '\0';
-		}
 
+	private:
 		void skip_whitespace()
 		{
 			while (std::isspace(current_char))
 			{
-				consume_char();
+				consume();
 			}
 		}
 
@@ -239,7 +244,7 @@ namespace lex
 			while (std::isdigit(current_char))
 			{
 				number += current_char;
-				consume_char();
+				consume();
 			}
 			return { token_type::integer, number };
 		}
@@ -250,7 +255,7 @@ namespace lex
 			while (std::isalnum(current_char))
 			{
 				identifier += current_char;
-				consume_char();
+				consume();
 			}
 
 			auto keyword = keywords.find(identifier);
@@ -261,8 +266,6 @@ namespace lex
 
 			if (current_char == '[')
 			{
-				consume_char();
-				consume_char();
 				return { token_type::function_call, identifier };
 			}
 
@@ -272,12 +275,12 @@ namespace lex
 		token get_string_token()
 		{
 			std::string str;
-			consume_char(); // Consume the opening quotation mark
+			consume(); // Consume the opening quotation mark
 
 			while (current_char != '\0' && current_char != '"')
 			{
 				str += current_char;
-				consume_char();
+				consume();
 			}
 
 			if (current_char != '"')
@@ -285,7 +288,7 @@ namespace lex
 				throw std::runtime_error("Unterminated string literal");
 			}
 
-			consume_char(); // Consume the closing quotation mark
+			consume(); // Consume the closing quotation mark
 
 			return { token_type::string, str };
 		}
