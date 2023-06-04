@@ -1,3 +1,5 @@
+let test_variable: str = "hey"
+
 fn test(age: int, name: str)
 {
   print "called function test() with value ${age} and ${name}"
@@ -11,3 +13,5 @@ fn foo()
 test[5, "taylor"]
 test[7, "riven"]
 foo[]
+
+print "${test_variable}"

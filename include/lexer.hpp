@@ -252,7 +252,9 @@ namespace lex
 		token get_identifier_token()
 		{
 			std::string identifier;
-			while (std::isalnum(current_char))
+
+			// is there a better way to do this? looks kinda ugly
+			while (std::isalnum(current_char) || current_char == '_')
 			{
 				identifier += current_char;
 				consume();
