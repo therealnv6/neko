@@ -46,20 +46,24 @@ public:
 
 		while (current_token.type != token_type::eof)
 		{
+			// there should be a better way to do this, thoughts?
 			if (lexer.get_token_pos() >= stack_limit_switch && stack_limit_switch != -1)
 			{
 				lexer.set_token_pos(previous_stack);
 				stack_limit_switch = -1;
 			}
 
+			// we have this variable to find it first, so we can check if it exists.
 			auto function = func_map.find(current_token.type);
 
 			if (function != func_map.end())
 			{
+				// we might be able to call the function variable above, but i couldn't find a way.
 				auto function = func_map[current_token.type];
 				(this->*function)(current_token);
 			}
 
+			// we set current_token to the next token, this is for the next iteration.
 			current_token = lexer.get_next_token();
 		}
 	}
@@ -79,7 +83,10 @@ private:
 	{
 		lex::let_data data = lexer.lex_let();
 
-		variables[data.var.name] = std::make_pair(data.var.type_container.type_name, data.value->data());
+		variables[data.var.name] = std::make_pair(
+			data.var.type_container.type_name,
+			data.value->data() // this is optional, we might want to make a check in the future. for now, the optionality is not implemented.
+		);
 	}
 
 	void handle_function(token &)
