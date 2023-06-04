@@ -23,6 +23,7 @@ enum class token_type
 
 	// Functions
 	function,
+	function_call,
 	parameter,
 	left_parenthesis,
 	right_parenthesis,
@@ -48,7 +49,7 @@ static const std::unordered_map<std::string, token_type> char_tokens = {
 static const std::unordered_map<std::string, token_type> keywords = {
 	{  "let",		 token_type::let},
 	{"print",	   token_type::print},
-	{	  "fn", token_type::function}
+	{	  "fn", token_type::function},
 };
 
 const std::unordered_map<std::string, token_type> type_tokens = {

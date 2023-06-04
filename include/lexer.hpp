@@ -11,7 +11,6 @@
 
 namespace lex
 {
-
 	struct type_data {
 		token_type type;
 		std::string type_name;
@@ -188,8 +187,7 @@ namespace lex
 			return data;
 		}
 
-		std::pair<token, token>
-		handle_type_declaration(token identifier_token)
+		std::pair<token, token> handle_type_declaration(token identifier_token)
 		{
 			expect_token(token_type::identifier, identifier_token);
 			expect_token(token_type::colon, get_next_token());
@@ -203,6 +201,11 @@ namespace lex
 		int get_token_pos()
 		{
 			return pos;
+		}
+
+		void set_token_pos(int pos)
+		{
+			this->pos = pos;
 		}
 
 	private:
@@ -254,6 +257,13 @@ namespace lex
 			if (keyword != keywords.end())
 			{
 				return { keyword->second, identifier };
+			}
+
+			if (current_char == '[')
+			{
+				consume_char();
+				consume_char();
+				return { token_type::function_call, identifier };
 			}
 
 			return { token_type::identifier, identifier };

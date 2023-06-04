@@ -5,13 +5,16 @@
 
 class interpreter
 {
-	typedef void (interpreter::*callback)();
+	typedef void (interpreter::*callback)(token &);
 
 private:
 	std::string program;
 	lex::lexer lexer;
 
 	token current_token = {};
+
+	int stack_limit_switch = -1;
+	int previous_stack = -1;
 
 	std::map<std::string, std::pair<std::string, std::string>> variables;
 
@@ -28,20 +31,33 @@ public:
 		func_map.emplace(token_type::let, &interpreter::handle_let);
 		func_map.emplace(token_type::print, &interpreter::handle_print);
 		func_map.emplace(token_type::function, &interpreter::handle_function);
+		func_map.emplace(token_type::function_call, &interpreter::handle_function_call);
 	}
 
 	void run()
 	{
+		if (lexer.get_token_pos() >= stack_limit_switch && stack_limit_switch != -1)
+		{
+			lexer.set_token_pos(previous_stack);
+			stack_limit_switch = -1;
+		}
+
 		current_token = lexer.get_next_token();
 
 		while (current_token.type != token_type::eof)
 		{
+			if (lexer.get_token_pos() >= stack_limit_switch && stack_limit_switch != -1)
+			{
+				lexer.set_token_pos(previous_stack);
+				stack_limit_switch = -1;
+			}
+
 			auto function = func_map.find(current_token.type);
 
 			if (function != func_map.end())
 			{
 				auto function = func_map[current_token.type];
-				(this->*function)();
+				(this->*function)(current_token);
 			}
 
 			current_token = lexer.get_next_token();
@@ -59,17 +75,18 @@ public:
 	}
 
 private:
-	void handle_let()
+	void handle_let(token &)
 	{
 		lex::let_data data = lexer.lex_let();
 
 		variables[data.var.name] = std::make_pair(data.var.type_container.type_name, data.value->data());
 	}
 
-	void handle_function()
+	void handle_function(token &)
 	{
 		lex::function_data data = lexer.lex_function();
 
+		function_addresses.emplace(data.function_name, data.address);
 		std::cout << "function address for "
 				  << data.function_name
 				  << ": "
@@ -77,7 +94,23 @@ private:
 				  << std::endl;
 	}
 
-	void handle_print()
+	void handle_function_call(token &current)
+	{
+		previous_stack = lexer.get_token_pos();
+		auto call_site = function_addresses.find(current.value);
+
+		if (call_site == function_addresses.end())
+		{
+			throw std::runtime_error("unknown function: " + current.value);
+		}
+
+		auto [begin, end] = call_site->second;
+
+		lexer.set_token_pos(begin);
+		stack_limit_switch = end;
+	}
+
+	void handle_print(token &)
 	{
 		token value_token = lexer.get_next_token();
 		expect_token(token_type::string, value_token);
