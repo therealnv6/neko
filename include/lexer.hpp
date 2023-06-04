@@ -33,6 +33,11 @@ namespace lex
 		std::optional<std::string> value;
 	};
 
+	struct function_call_data {
+		std::string function_name;
+		std::vector<let_data> token_data;
+	};
+
 	class lexer
 	{
 	private:
@@ -190,6 +195,45 @@ namespace lex
 			}
 
 			return data;
+		}
+
+		function_call_data lex_function_call(const token &current, std::map<std::string, std::map<std::string, token_type>> &function_token_map)
+		{
+			function_call_data call_data;
+			call_data.function_name = current.value;
+
+			auto tokens = function_token_map.find(current.value);
+
+			expect_token(token_type::left_square_bracket, get_next_token());
+
+			if (tokens != function_token_map.end())
+			{
+				for (auto entry : tokens->second)
+				{
+					if (get_at() == ',')
+					{
+						consume();
+					}
+
+					var_data var_data {
+						.name = entry.first,
+					};
+
+					var_data.type_container.type = entry.second;
+					var_data.type_container.type_name = entry.first;
+
+					let_data let_data {
+						.var = var_data,
+						.value = get_next_token().value,
+					};
+
+					call_data.token_data.push_back(let_data);
+				}
+			}
+
+			expect_token(token_type::right_square_bracket, get_next_token());
+
+			return call_data;
 		}
 
 		std::pair<token, token> handle_type_declaration(token identifier_token)

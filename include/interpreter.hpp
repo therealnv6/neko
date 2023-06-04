@@ -110,10 +110,10 @@ private:
 
 	void handle_function_call(token &current)
 	{
+		auto call_data = lexer.lex_function_call(current, function_token_map);
 		previous_stack = lexer.get_token_pos();
 
 		auto call_site = function_addresses.find(current.value);
-		auto tokens = function_token_map.find(current.value);
 
 		if (call_site == function_addresses.end())
 		{
@@ -122,26 +122,15 @@ private:
 
 		auto [begin, end] = call_site->second;
 
-		lexer.expect_token(token_type::left_square_bracket, lexer.get_next_token());
-
-		if (tokens != function_token_map.end())
+		for (auto token : call_data.token_data)
 		{
-			for (auto entry : tokens->second)
-			{
-				if (lexer.get_at() == ',')
-				{
-					lexer.consume();
-				}
-
-				// we may want to write this data to a different register than variables,
-				// we'll see in the future.
-				variables[entry.first] = std::make_pair("" /*todo: fill this*/, lexer.get_next_token().value);
-			}
+			variables[token.var.name] = std::make_pair(
+				token.var.type_container.type_name,
+				token.value->data() // could cause a segfault because it's an optional<>. todo: implement actual optional values
+			);
 		}
 
-		lexer.expect_token(token_type::right_square_bracket, lexer.get_next_token());
 		lexer.set_token_pos(begin);
-
 		stack_limit_switch = end;
 	}
 
