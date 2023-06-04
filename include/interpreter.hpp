@@ -111,14 +111,14 @@ private:
 	void handle_function_call(token &current)
 	{
 		auto call_data = lexer.lex_function_call(current, function_token_map);
-		previous_stack = lexer.get_token_pos();
-
 		auto call_site = function_addresses.find(current.value);
 
 		if (call_site == function_addresses.end())
 		{
 			throw std::runtime_error("unknown function: " + current.value);
 		}
+
+		previous_stack = lexer.get_token_pos();
 
 		auto [begin, end] = call_site->second;
 
