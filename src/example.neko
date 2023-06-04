@@ -10,8 +10,8 @@ fn foo()
   print "bar"
 }
 
-test[5, "taylor"]
-test[7, "riven"]
-foo[]
+test(5, "taylor")
+test(7, "riven")
+foo()
 
 print "${test_variable}"

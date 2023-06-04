@@ -38,12 +38,22 @@ namespace lex
 		std::vector<let_data> token_data;
 	};
 
+  enum lexing_state 
+  {
+    function_sig,
+    function_body,
+    function_call,
+    unknown,
+  };
+
 	class lexer
 	{
 	private:
 		std::string program;
 		std::size_t pos = 0;
 		char current_char;
+
+    lexing_state state;
 
 	public:
 		lexer(const std::string &program)
@@ -133,6 +143,8 @@ namespace lex
 
 		lex::function_data lex_function()
 		{
+      state = lexing_state::function_sig;
+
 			token identifier_token = get_next_token();
 			expect_token(token_type::identifier, identifier_token);
 			expect_token(token_type::left_parenthesis, get_next_token());
@@ -173,6 +185,7 @@ namespace lex
 				}
 			}
 
+      state = lexing_state::function_body;
 			try
 			{
 				expect_token(token_type::left_brace, get_next_token());
@@ -194,17 +207,20 @@ namespace lex
 				throw std::runtime_error("no function body: " + std::string(e.what()));
 			}
 
+      state = lexing_state::unknown;
 			return data;
 		}
 
 		function_call_data lex_function_call(const token &current, std::map<std::string, std::map<std::string, token_type>> &function_token_map)
 		{
+      state = lexing_state::function_call;
+
 			function_call_data call_data;
 			call_data.function_name = current.value;
 
 			auto tokens = function_token_map.find(current.value);
 
-			expect_token(token_type::left_square_bracket, get_next_token());
+			expect_token(token_type::left_parenthesis, get_next_token());
 
 			if (tokens != function_token_map.end())
 			{
@@ -231,7 +247,7 @@ namespace lex
 				}
 			}
 
-			expect_token(token_type::right_square_bracket, get_next_token());
+			expect_token(token_type::right_parenthesis, get_next_token());
 
 			return call_data;
 		}
@@ -310,7 +326,7 @@ namespace lex
 				return { keyword->second, identifier };
 			}
 
-			if (current_char == '[')
+			if (current_char == '(' && state != lexing_state::function_sig)
 			{
 				return { token_type::function_call, identifier };
 			}
