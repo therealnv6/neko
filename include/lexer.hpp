@@ -277,6 +277,7 @@ namespace lex
 		void set_token_pos(int pos)
 		{
 			this->pos = pos;
+			this->current_char = program[pos];
 		}
 
 		void expect_token(token_type expected_type, const token &token)

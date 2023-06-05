@@ -1,5 +1,6 @@
 #include <fstream>
 
+#include <compiler.hpp>
 #include <interpreter.hpp>
 #include <iostream>
 #include <token.hpp>
@@ -12,4 +13,7 @@ int main()
 
 	interpreter interpreter { program };
 	interpreter.run();
+
+	compiler compiler(program, "build/neko-built");
+	compiler.compile();
 }
