@@ -19,6 +19,8 @@ enum class token_type
 	equals,
 	plus,
 	minus,
+	multiply,
+	divide,
 	comma,
 
 	// Functions
@@ -41,6 +43,8 @@ static const std::unordered_map<std::string, token_type> char_tokens = {
 	{"=",			   token_type::equals},
 	{"+",				 token_type::plus},
 	{"-",				token_type::minus},
+	{"*",			 token_type::multiply},
+	{"/",			   token_type::divide},
 	{"(",	   token_type::left_parenthesis},
 	{")",	   token_type::right_parenthesis},
 	{"{",		   token_type::left_brace},
@@ -56,9 +60,24 @@ static const std::unordered_map<std::string, token_type> keywords = {
 	{	  "fn", token_type::function},
 };
 
-const std::unordered_map<std::string, token_type> type_tokens = {
+static const std::unordered_map<std::string, token_type> type_tokens = {
 	{"int", token_type::integer},
 	{"str",	 token_type::string}
+};
+
+static const std::unordered_map<token_type, std::string> operators = {
+	{	  token_type::plus, "+"},
+	{	  token_type::minus, "-"},
+	{token_type::multiply, "*"},
+	{  token_type::divide, "/"},
+};
+
+enum class expr_type
+{
+	literal,
+	identifier,
+	assignment,
+	binary_operator,
 };
 
 struct token {

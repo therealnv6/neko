@@ -2,7 +2,10 @@
 - [ ] Add a compiler utilizing LLVM
 - [ ] Write OpenGL bindings
 - [ ] Achieve Turing completeness
-
+  - [ ] Expressions (in progress)
+  - [x] Functions
+  - [x] Memory-stored data
+  
 ... more
 
 # Current Features

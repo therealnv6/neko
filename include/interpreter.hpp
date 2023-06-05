@@ -21,17 +21,18 @@ private:
 	std::map<std::string, std::pair<int, int>> function_addresses;
 	std::map<std::string, std::map<std::string, token_type>> function_token_map;
 
-	std::map<token_type, callback> func_map;
+	std::map<token_type, callback> func_map {
+		{		  token_type::let,		   &interpreter::handle_let},
+		{		  token_type::print,		 &interpreter::handle_print},
+		{	  token_type::function,		&interpreter::handle_function},
+		{token_type::function_call, &interpreter::handle_function_call}
+	};
 
 public:
 	interpreter(const std::string &program)
 		: program(program)
 		, lexer(program)
 	{
-		func_map.emplace(token_type::let, &interpreter::handle_let);
-		func_map.emplace(token_type::print, &interpreter::handle_print);
-		func_map.emplace(token_type::function, &interpreter::handle_function);
-		func_map.emplace(token_type::function_call, &interpreter::handle_function_call);
 	}
 
 	void run()

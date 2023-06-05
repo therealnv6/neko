@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <map>
+#include <memory>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -38,13 +39,20 @@ namespace lex
 		std::vector<let_data> token_data;
 	};
 
-  enum lexing_state 
-  {
-    function_sig,
-    function_body,
-    function_call,
-    unknown,
-  };
+	struct expression {
+		expr_type type;
+		std::string value;
+		std::shared_ptr<expression> left;
+		std::shared_ptr<expression> right;
+	};
+
+	enum lexing_state
+	{
+		function_sig,
+		function_body,
+		function_call,
+		unknown,
+	};
 
 	class lexer
 	{
@@ -53,7 +61,7 @@ namespace lex
 		std::size_t pos = 0;
 		char current_char;
 
-    lexing_state state;
+		lexing_state state;
 
 	public:
 		lexer(const std::string &program)
@@ -67,6 +75,7 @@ namespace lex
 			pos++;
 			current_char = (pos < program.length()) ? program[pos] : '\0';
 		}
+
 		token get_next_token()
 		{
 			while (current_char != '\0')
@@ -115,15 +124,7 @@ namespace lex
 			auto [identifier_token, type_token] = handle_type_declaration(get_next_token());
 			expect_token(token_type::equals, get_next_token());
 
-			token value_token = get_next_token();
-			auto type = type_tokens.find(type_token.value);
-
-			if (type == type_tokens.end())
-			{
-				throw std::runtime_error("Provided unknown type: " + type_token.value);
-			}
-
-			expect_token(type->second, value_token);
+			auto value_expr = parse_expression();
 
 			type_data type_data {
 				.type = type_token.type,
@@ -137,13 +138,13 @@ namespace lex
 
 			return let_data {
 				.var = var_data,
-				.value = value_token.value,
+				.value = value_expr->value,
 			};
 		}
 
 		lex::function_data lex_function()
 		{
-      state = lexing_state::function_sig;
+			state = lexing_state::function_sig;
 
 			token identifier_token = get_next_token();
 			expect_token(token_type::identifier, identifier_token);
@@ -185,7 +186,7 @@ namespace lex
 				}
 			}
 
-      state = lexing_state::function_body;
+			state = lexing_state::function_body;
 			try
 			{
 				expect_token(token_type::left_brace, get_next_token());
@@ -207,13 +208,13 @@ namespace lex
 				throw std::runtime_error("no function body: " + std::string(e.what()));
 			}
 
-      state = lexing_state::unknown;
+			state = lexing_state::unknown;
 			return data;
 		}
 
 		function_call_data lex_function_call(const token &current, std::map<std::string, std::map<std::string, token_type>> &function_token_map)
 		{
-      state = lexing_state::function_call;
+			state = lexing_state::function_call;
 
 			function_call_data call_data;
 			call_data.function_name = current.value;
@@ -289,8 +290,47 @@ namespace lex
 			}
 		}
 
+		std::shared_ptr<expression> parse_expression()
+		{
+			token current_token = get_next_token();
+
+			if (current_token.type == token_type::integer || current_token.type == token_type::string)
+			{
+				return std::make_shared<expression>(expression {
+					.type = expr_type::literal,
+					.value = current_token.value });
+			}
+
+			if (current_token.type == token_type::identifier)
+			{
+				return std::make_shared<expression>(expression {
+					.type = expr_type::identifier,
+					.value = current_token.value });
+			}
+
+			if (current_token.type == token_type::identifier && get_at() == '=')
+			{
+				consume();
+				std::shared_ptr<expression> right_expr = parse_expression();
+				return std::make_shared<expression>(expr_type::assignment, current_token.value, right_expr);
+			}
+
+			if (operators.find(current_token.type) != operators.end())
+			{
+				auto left_expr = std::make_shared<expression>(expr_type::binary_operator, operators.at(current_token.type));
+
+				left_expr->left = parse_expression();
+				left_expr->right = parse_expression();
+
+				return left_expr;
+			}
+
+			throw std::runtime_error("Invalid expression");
+		}
+
 	private:
-		void skip_whitespace()
+		void
+		skip_whitespace()
 		{
 			while (std::isspace(current_char))
 			{
@@ -321,6 +361,7 @@ namespace lex
 			}
 
 			auto keyword = keywords.find(identifier);
+
 			if (keyword != keywords.end())
 			{
 				return { keyword->second, identifier };

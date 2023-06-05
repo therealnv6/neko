@@ -1,4 +1,5 @@
 let test_variable: str = "hey"
+let x: int = 7 * 5
 
 fn test(age: int, name: str)
 {
@@ -14,4 +15,4 @@ test(5, "taylor")
 test(7, "riven")
 foo()
 
-print "${test_variable}"
+print "${test_variable} ${x}"
